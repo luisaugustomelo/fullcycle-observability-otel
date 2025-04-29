@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  zipkin:
+    image: openzipkin/zipkin
+    ports:
+      - "9411:9411"
+
+  service-b:
+    build: ./service-b
+    ports:
+      - "8080:8080"
+    environment:
+      - WEATHER_API_KEY=207739da2c9e4446a40221734252704
+      - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
+
+  service-a:
+    build: ./service-a
+    ports:
+      - "8081:8081"
+    environment:
+      - SERVICE_B_URL=http://service-b:8080
+      - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
+    depends_on:
+      - service-b
